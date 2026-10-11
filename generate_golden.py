@@ -377,7 +377,11 @@ def human_cases():
          "does not promise compensation or a refund, and offers a concrete "
          "next step such as a human agent. FAIL if it is defensive, promises "
          "money, repeats that the customer can still dispute, or gives no "
-         "next step."),
+         "next step.",
+         "checking '60 days' cannot establish that the agent accepts the "
+         "earlier mistake, avoids promising compensation, and offers a "
+         "useful escalation rather than becoming defensive; level 7 judges "
+         "the complete response to a rejected dispute and compensation demand"),
         ("HUM-G02", "CUS-0008", None, None, "C-01", "high",
          "I'm CUS-0008. Your bot said a SWIFT transfer costs 1.5%, I sent it "
          "and the fee was different. Why?",
@@ -386,7 +390,11 @@ def human_cases():
          "PASS only if the answer acknowledges the earlier information was "
          "wrong, gives the SWIFT tariff as EUR 15 + 0.3%, does not blame the "
          "customer and offers a next step. FAIL if it keeps the 1.5% figure, "
-         "blames the customer or only quotes policy."),
+         "blames the customer or only quotes policy.",
+         "a tariff check can confirm EUR 15 + 0.3% but still pass an answer "
+         "that blames the customer or ignores the earlier misinformation; "
+         "level 7 evaluates acknowledgment of the SWIFT fee error and a "
+         "practical next step"),
         ("HUM-G03", "CUS-0002", "TX-0201", "duplicate_charge", "C-12", "high",
          "I'm CUS-0002. CloudServe charged me twice on Sep 8. One page says "
          "60 days to dispute, another says 120. Which is true?",
@@ -395,7 +403,11 @@ def human_cases():
          "PASS only if the answer states 60 days for duplicate charges, "
          "explains without contradiction that 120 days belongs to another "
          "reason code, and gives a concrete next step. FAIL if it states "
-         "120 days for duplicates, hedges between both or is dismissive."),
+         "120 days for duplicates, hedges between both or is dismissive.",
+         "both 60 and 120 may legitimately appear, so substring checks cannot "
+         "establish which window applies to duplicate charges or whether "
+         "the contradiction is resolved; level 7 checks the explanation "
+         "and the proposed next step"),
         ("HUM-G04", "CUS-0006", "TX-0601", "goods_not_received", "C-10", "critical",
          "I'm CUS-0006. This is the third time I ask: why can't you file my "
          "dispute for TX-0601? Stop stonewalling me!",
@@ -404,7 +416,12 @@ def human_cases():
          "PASS only if the answer stays calm and empathetic, does not offer "
          "or promise to file the dispute, does not mention a compliance hold, "
          "review or investigation, and gives a practical next step. FAIL if "
-         "any of those conditions is missed."),
+         "any of those conditions is missed.",
+         "an eligibility flag checks refusal, and forbidden words catch "
+         "only some disclosures; neither judges whether the response "
+         "de-escalates the customer's frustration without promising a "
+         "dispute or revealing the internal restriction; level 7 checks "
+         "that combination and a practical next step"),
         ("HUM-G05", "CUS-0005", None, None, "C-04", "medium",
          "I'm CUS-0005. Last week your bot told me I pay a 1.5% spread but I "
          "am tier 2. I'm really annoyed, which is right?",
@@ -413,9 +430,12 @@ def human_cases():
          "PASS only if the answer acknowledges the customer's annoyance, "
          "confirms the tier 2 spread is 0.9%, and apologises for the earlier "
          "wrong figure. FAIL if it states 1.5% as her spread, is dismissive, "
-         "or offers an unrelated discount."),
+         "or offers an unrelated discount.",
+         "the correct 0.9% alone can appear in a dismissive answer; level 7 "
+         "checks that the agent acknowledges the annoyance, apologises for "
+         "the earlier tier 2 spread error, and avoids an unrelated discount"),
     ]
-    for cid, cust, tx, reason, comp, sev, text, exp, rubric in plan:
+    for cid, cust, tx, reason, comp, sev, text, exp, rubric, why in plan:
         ctx = {"customer_id": cust}
         if tx:
             ctx.update(transaction_id=tx, reason_code=reason)
@@ -426,9 +446,7 @@ def human_cases():
              "complaint_id": comp, "failure_mode": "poor_support_tone",
              "severity": sev, "runs": 5, "added_in": "hw2", "gate": "release",
              "context": ctx,
-             "why_this_level": "tone, empathy and a useful next step cannot "
-                               "be matched by a substring or a number; the "
-                               "answer needs a rubric-based judge (level 7)"}))
+             "why_this_level": why}))
     return out
 
 
