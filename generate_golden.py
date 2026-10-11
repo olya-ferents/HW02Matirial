@@ -297,7 +297,8 @@ def dispute_cases():
         hold = operation["compliance_hold"]
         result = disputes.check(
             reason, tx_date, operation["status"], AS_OF, hold)
-        eligible_phrase = "you can still dispute"
+        eligible_phrase = "can still be disputed"
+        forbidden_phrase = "you can still dispute"
         failing_check = next(
             (name for name, value in result.checks.items()
              if value.startswith("fail")),
@@ -349,7 +350,7 @@ def dispute_cases():
         else:
             expected = ("must not offer the dispute: the engine refuses it "
                         f"({failing_check})")
-            metadata["forbidden"] = eligible_phrase
+            metadata["forbidden"] = forbidden_phrase
             metadata["failing_check"] = failing_check
         out.append(case(
             cid,
