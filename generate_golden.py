@@ -352,6 +352,19 @@ def dispute_cases():
                         f"({failing_check})")
             metadata["forbidden"] = forbidden_phrase
             metadata["failing_check"] = failing_check
+        if cid in ("DIS-G001", "DIS-G006"):
+            metadata.update({
+                "layer": "action",
+                "assertion": "tool_result_flag",
+                "tool": "check_dispute_eligibility",
+                "field": "eligible",
+                "expected_flag": result.eligible,
+                "why_this_level": (
+                    "the engine eligibility flag is a boolean; level 1 checks "
+                    "the tool result without requiring a particular wording "
+                    "of the agent's affirmative answer"),
+            })
+            expected = f"check_dispute_eligibility.eligible = {str(result.eligible).lower()}"
         out.append(case(
             cid,
             complaint_inputs[complaint_id] if complaint_id else
